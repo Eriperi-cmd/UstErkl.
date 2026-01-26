@@ -1,0 +1,82 @@
+<!-- frontend/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Company Reporting</title>
+</head>
+<body>
+
+<h2>Company Report</h2>
+
+<form id="reportForm">
+  <input name="company_name" placeholder="Company Name" required />
+  <input name="street" placeholder="Street" />
+  <input name="street_number" placeholder="No." />
+  <input name="postcode" placeholder="Postcode" />
+  <input name="city" placeholder="City" />
+  <input name="year" type="number" placeholder="Year" />
+
+  <input name="sales_19_81" placeholder="19% Sales (81)" type="number" />
+  <input name="sales_7_86" placeholder="7% Sales (86)" type="number" />
+  <input name="inn_erw_kz43" placeholder="Inn.Erw Kz43" type="number" />
+  <input name="inn_erw_kz89" placeholder="Inn.Erw Kz89" type="number" />
+  <input name="vorsteuer_61" placeholder="Vorsteuer 61" type="number" />
+
+  <button type="submit">Save</button>
+</form>
+
+<h2>Reports</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Company</th>
+      <th>Year</th>
+      <th>19%</th>
+      <th>7%</th>
+      <th>Kz43</th>
+      <th>Kz89</th>
+      <th>Vorsteuer</th>
+    </tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+async function loadReports() {
+  const res = await fetch(API + "/reports");
+  const data = await res.json();
+
+  rows.innerHTML = data.map(r => `
+    <tr>
+      <td>${r.company_name}</td>
+      <td>${r.year}</td>
+      <td>${r.sales_19_81}</td>
+      <td>${r.sales_7_86}</td>
+      <td>${r.inn_erw_kz43}</td>
+      <td>${r.inn_erw_kz89}</td>
+      <td>${r.vorsteuer_61}</td>
+    </tr>
+  `).join("");
+}
+
+reportForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(reportForm));
+
+  await fetch(API + "/reports", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(data)
+  });
+
+  reportForm.reset();
+  loadReports();
+};
+
+loadReports();
+</script>
+
+</body>
+</html>
